@@ -3207,7 +3207,7 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"Assertions\x12:\n" +
 	"\n" +
 	"assertions\x18\x01 \x03(\v2\x15.openfga.v1.AssertionB\x03\xe0A\x02R\n" +
-	"assertions2\xaf\xee\x01\n" +
+	"assertions2\xb1\xee\x01\n" +
 	"\x0eOpenFGAService\x12\x8f\x1d\n" +
 	"\x04Read\x12\x17.openfga.v1.ReadRequest\x1a\x18.openfga.v1.ReadResponse\"\xd3\x1c\x92A\xad\x1c\n" +
 	"\x13Relationship Tuples\x12\x12Get related tuples\x1a\xfb\x1bThe Read API will return the tuples from a certain store that match a query filter specified in the body of the request. \n" +
@@ -3916,9 +3916,9 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"The response contains the related objects in an array in the \"objects\" field of the response and they will be strings in the object format `<type>:<id>` (e.g. \"document:roadmap\").\n" +
 	"\n" +
 	"The number of objects in the response array will be limited by the execution timeout specified in the flag `OPENFGA_LIST_OBJECTS_DEADLINE` and by the upper bound specified in the flag `OPENFGA_LIST_OBJECTS_MAX_RESULTS`, whichever is hit first.\n" +
-	"The objects given will not be sorted, and therefore two identical calls can give a given different set of objects.*\vListObjects\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/stores/{store_id}/list-objects\x12\xdc\x11\n" +
-	"\tListUsers\x12\x1c.openfga.v1.ListUsersRequest\x1a\x1d.openfga.v1.ListUsersResponse\"\x91\x11\x92A\xe5\x10\n" +
-	"\x14Relationship Queries\x12/List all users with a relationship to an object\x1a\x90\x10The ListUsers API returns a list of all the users of a specific type that have a relation to a given object.\n" +
+	"The objects given will not be sorted, and therefore two identical calls can give a given different set of objects.*\vListObjects\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/stores/{store_id}/list-objects\x12\xde\x11\n" +
+	"\tListUsers\x12\x1c.openfga.v1.ListUsersRequest\x1a\x1d.openfga.v1.ListUsersResponse\"\x93\x11\x92A\xe7\x10\n" +
+	"\x14Relationship Queries\x12/List all users with a relationship to an object\x1a\x92\x10The ListUsers API returns a list of all the users of a specific type that have a relation to a given object.\n" +
 	"\n" +
 	" To arrive at a result, the API uses:\n" +
 	"\n" +
@@ -3942,7 +3942,9 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"> **Note:** We recommend you provide a value for all the input parameters of all the conditions. This ensures that all tuples be evaluated correctly.\n" +
 	"\n" +
 	"The response will contain the related users in an array in the \"users\" field of the response. These results may include specific objects, usersets \n" +
-	"or type-bound public access. Each of these types of results is encoded in its own type and not represented as a string.In cases where a type-bound public access result is returned (e.g. `user:*`), it cannot be inferred that all subjects\n" +
+	"or type-bound public access. Each of these types of results is encoded in its own type and not represented as a string.\n" +
+	"\n" +
+	"In cases where a type-bound public access result is returned (e.g. `user:*`), it cannot be inferred that all subjects\n" +
 	"of that type have a relation to the object; it is possible that negations exist and checks should still be queried\n" +
 	"on individual subjects to ensure access to that document.The number of users in the response array will be limited by the execution timeout specified in the flag `OPENFGA_LIST_USERS_DEADLINE` and by the upper bound specified in the flag `OPENFGA_LIST_USERS_MAX_RESULTS`, whichever is hit first.\n" +
 	"The returned users will not be sorted, and therefore two identical calls may yield different sets of users.*\tListUsers\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/stores/{store_id}/list-usersB\xa1\x01\n" +
