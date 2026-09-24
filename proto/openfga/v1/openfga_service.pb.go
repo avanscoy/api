@@ -39,7 +39,7 @@ type ListObjectsRequest struct {
 	// Additional request context that will be used to evaluate any ABAC conditions encountered
 	// in the query evaluation.
 	Context *structpb.Struct `protobuf:"bytes,7,opt,name=context,proto3" json:"context,omitempty"`
-	// Controls the consistency preference for this request. Default value is UNSPECIFIED, which will have the same behavior as MINIMIZE_LATENCY.
+	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which will have the same behavior as MINIMIZE_LATENCY.
 	Consistency   ConsistencyPreference `protobuf:"varint,8,opt,name=consistency,proto3,enum=openfga.v1.ConsistencyPreference" json:"consistency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3207,16 +3207,17 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"Assertions\x12:\n" +
 	"\n" +
 	"assertions\x18\x01 \x03(\v2\x15.openfga.v1.AssertionB\x03\xe0A\x02R\n" +
-	"assertions2\xee\xf0\x01\n" +
-	"\x0eOpenFGAService\x12\xd0\x1d\n" +
-	"\x04Read\x12\x17.openfga.v1.ReadRequest\x1a\x18.openfga.v1.ReadResponse\"\x94\x1d\x92A\xee\x1c\n" +
-	"\x13Relationship Tuples\x12WGet tuples from the store that matches a query, without following userset rewrite rules\x1a\xf7\x1bThe Read API will return the tuples for a certain store that match a query filter specified in the body of the request. \n" +
+	"assertions2\xaf\xee\x01\n" +
+	"\x0eOpenFGAService\x12\x8f\x1d\n" +
+	"\x04Read\x12\x17.openfga.v1.ReadRequest\x1a\x18.openfga.v1.ReadResponse\"\xd3\x1c\x92A\xad\x1c\n" +
+	"\x13Relationship Tuples\x12\x12Get related tuples\x1a\xfb\x1bThe Read API will return the tuples from a certain store that match a query filter specified in the body of the request. \n" +
 	"The API doesn't guarantee order by any field. \n" +
 	"It is different from the `/stores/{store_id}/expand` API in that it only returns relationship tuples that are stored in the system and satisfy the query. \n" +
 	"In the body:\n" +
 	"1. `tuple_key` is optional. If not specified, it will return all tuples in the store.\n" +
 	"2. `tuple_key.object` is mandatory if `tuple_key` is specified. It can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).\n" +
 	"3. `tuple_key.user` is mandatory if tuple_key is specified in the case the `tuple_key.object` is a type only. If tuple_key.user is specified, it needs to be a full object (e.g., `type:user_id`).\n" +
+	"\n" +
 	"## Examples\n" +
 	"### Query for all objects in a type definition\n" +
 	"To query for all objects that `user:bob` has `reader` relationship in the `document` type definition, call read API with body of\n" +
@@ -3247,6 +3248,7 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"```\n" +
 	"This means that `user:bob` has a `reader` relationship with 1 document `document:2021-budget`. Note that this API, unlike the List Objects API, does not evaluate the tuples in the store.\n" +
 	"The continuation token will be empty if there are no more tuples to query.\n" +
+	"\n" +
 	"### Query for all stored relationship tuples that have a particular relation and object\n" +
 	"To query for all users that have `reader` relationship with `document:2021-budget`, call read API with body of \n" +
 	"```json\n" +
@@ -3274,6 +3276,7 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"}\n" +
 	"```\n" +
 	"This means that `document:2021-budget` has 1 `reader` (`user:bob`).  Note that, even if the model said that all `writers` are also `readers`, the API will not return writers such as `user:anne` because it only returns tuples and does not evaluate them.\n" +
+	"\n" +
 	"### Query for all users with all relationships for a particular document\n" +
 	"To query for all users that have any relationship with `document:2021-budget`, call read API with body of \n" +
 	"```json\n" +
@@ -3308,16 +3311,21 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"}\n" +
 	"```\n" +
 	"This means that `document:2021-budget` has 1 `reader` (`user:bob`) and 1 `writer` (`user:anne`).\n" +
-	"*\x04Read\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/stores/{store_id}/read\x12\xcc\x12\n" +
-	"\x05Write\x12\x18.openfga.v1.WriteRequest\x1a\x19.openfga.v1.WriteResponse\"\x8d\x12\x92A\xe6\x11\n" +
-	"\x13Relationship Tuples\x12#Add or delete tuples from the store\x1a\xa2\x11The Write API will transactionally update the tuples for a certain store. Tuples and type definitions allow OpenFGA to determine whether a relationship exists between an object and an user.\n" +
+	"*\x04Read\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/stores/{store_id}/read\x12\xbe\x12\n" +
+	"\x05Write\x12\x18.openfga.v1.WriteRequest\x1a\x19.openfga.v1.WriteResponse\"\xff\x11\x92A\xd8\x11\n" +
+	"\x13Relationship Tuples\x12\x14Add or delete tuples\x1a\xa3\x11The Write API transactionally updates the tuples for a certain store. Tuples and type definitions allow OpenFGA to determine whether a relationship exists between an object and an user.\n" +
+	"\n" +
 	"In the body, `writes` adds new tuples and `deletes` removes existing tuples. When deleting a tuple, any `condition` specified with it is ignored.\n" +
+	"\n" +
 	"The API is not idempotent by default: if, later on, you try to add the same tuple key (even if the `condition` is different), or if you try to delete a non-existing tuple, it will throw an error.\n" +
+	"\n" +
 	"To allow writes when an identical tuple already exists in the database, set `\"on_duplicate\": \"ignore\"` on the `writes` object.\n" +
 	"To allow deletes when a tuple was already removed from the database, set `\"on_missing\": \"ignore\"` on the `deletes` object.\n" +
 	"If a Write request contains both idempotent (ignore) and non-idempotent (error) operations, the most restrictive action (error) will take precedence. If a condition fails for a sub-request with an error flag, the entire transaction will be rolled back. This gives developers explicit control over the atomicity of the requests.\n" +
+	"\n" +
 	"The API will not allow you to write tuples such as `document:2021-budget#viewer@document:2021-budget#viewer`, because they are implicit.\n" +
 	"An `authorization_model_id` may be specified in the body. If it is, it will be used to assert that each written tuple (not deleted) is valid for the model specified. If it is not specified, the latest authorization model ID will be used.\n" +
+	"\n" +
 	"## Example\n" +
 	"### Adding relationships\n" +
 	"To add `user:anne` as a `writer` for `document:2021-budget`, call write API with the following \n" +
@@ -3352,14 +3360,32 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  }\n" +
 	"}\n" +
 	"```\n" +
-	"*\x05Write\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/stores/{store_id}/write\x12\xda*\n" +
-	"\x05Check\x12\x18.openfga.v1.CheckRequest\x1a\x19.openfga.v1.CheckResponse\"\x9b*\x92A\xf4)\n" +
-	"\x14Relationship Queries\x126Check whether a user is authorized to access an object\x1a\x9c)The Check API returns whether a given user has a relationship with a given object in a given store.\n" +
+	"*\x05Write\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/stores/{store_id}/write\x12\xdb*\n" +
+	"\x05Check\x12\x18.openfga.v1.CheckRequest\x1a\x19.openfga.v1.CheckResponse\"\x9c*\x92A\xf5)\n" +
+	"\x14Relationship Queries\x12\x18Check user authorization\x1a\xbb)The Check API returns whether a given user has a relationship with a given object in a given store.\n" +
+	"\n" +
 	"The `user` field of the request can be a specific target, such as `user:anne`, or a userset (set of users) such as `group:marketing#member` or a type-bound public access `user:*`.\n" +
-	"To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`).\n" +
+	"To arrive at a result, the API uses:\n" +
+	"\n" +
+	"- An authorization model\n" +
+	"\n" +
+	"- Explicit tuples written through the Write API\n" +
+	"\n" +
+	"- Contextual tuples present in the request\n" +
+	"\n" +
+	"- Implicit tuples that exist by virtue of applying set theory\n" +
+	"\n" +
+	"For example: `document:2021-budget#viewer@document:2021-budget#viewer`. In this example, the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`).\n" +
+	"\n" +
 	"A `contextual_tuples` object may also be included in the body of the request. This object contains one field `tuple_keys`, which is an array of tuple keys. Each of these tuples may have an associated `condition`.\n" +
-	"You may also provide an `authorization_model_id` in the body. This will be used to assert that the input `tuple_key` is valid for the model specified. If not specified, the assertion will be made against the latest authorization model ID. It is strongly recommended to specify authorization model id for better performance.\n" +
-	"You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly.\n" +
+	"You may also provide an `authorization_model_id` in the body. This will be used to assert that the input `tuple_key` is valid for the model specified. If not specified, the assertion will be made against the latest authorization model ID.\n" +
+	"\n" +
+	"> **Note:** We recommend you specify authorization model id for better performance.\n" +
+	"\n" +
+	"You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system.\n" +
+	"\n" +
+	"> **Note:** We recommend you provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly.\n" +
+	"\n" +
 	"By default, the Check API caches results for a short time to optimize performance. You may specify a value of `HIGHER_CONSISTENCY` for the optional `consistency` parameter in the body to inform the server that higher conisistency is preferred at the expense of increased latency. Consideration should be given to the increased latency if requesting higher consistency.\n" +
 	"The response will return whether the relationship exists in the field `allowed`.\n" +
 	"\n" +
@@ -3472,16 +3498,16 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  \"consistency\": \"HIGHER_CONSISTENCY\"\n" +
 	"}\n" +
 	"```\n" +
-	"*\x05Check\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/stores/{store_id}/check\x12\x8b\x13\n" +
+	"*\x05Check\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/stores/{store_id}/check\x12\x80\x13\n" +
 	"\n" +
-	"BatchCheck\x12\x1d.openfga.v1.BatchCheckRequest\x1a\x1e.openfga.v1.BatchCheckResponse\"\xbd\x12\x92A\x90\x12\n" +
-	"\x14Relationship Queries\x125Send a list of `check` operations in a single request\x1a\xb4\x11The `BatchCheck` API functions nearly identically to `Check`, but instead of checking a single user-object relationship BatchCheck accepts a list of relationships to check and returns a map containing `BatchCheckItem` response for each check it received.\n" +
+	"BatchCheck\x12\x1d.openfga.v1.BatchCheckRequest\x1a\x1e.openfga.v1.BatchCheckResponse\"\xb2\x12\x92A\x85\x12\n" +
+	"\x14Relationship Queries\x12!Send a list of related operations\x1a\xbd\x11The `BatchCheck` API functions nearly identically to `Check`, but instead of checking a single user-object relationship BatchCheck accepts a list of relationships to check and returns a map containing `BatchCheckItem` response for each check it received.\n" +
 	"\n" +
 	"An associated `correlation_id` is required for each check in the batch. This ID is used to correlate a check to the appropriate response. It is a string consisting of only alphanumeric characters or hyphens with a maximum length of 36 characters. This `correlation_id` is used to map the result of each check to the item which was checked, so it must be unique for each item in the batch. We recommend using a UUID or ULID as the `correlation_id`, but you can use whatever unique identifier you need as long  as it matches this regex pattern: `^[\\w\\d-]{1,36}$`\n" +
 	"\n" +
-	"NOTE: The maximum number of checks that can be passed in the `BatchCheck` API is configurable via the [OPENFGA_MAX_CHECKS_PER_BATCH_CHECK](https://openfga.dev/docs/getting-started/setup-openfga/configuration#OPENFGA_MAX_CHECKS_PER_BATCH_CHECK) environment variable. If `BatchCheck` is called using the SDK, the SDK can split the batch check requests for you.\n" +
+	"> **Note:** The maximum number of checks that can be passed in the `BatchCheck` API is configurable via the [OPENFGA_MAX_CHECKS_PER_BATCH_CHECK](https://openfga.dev/docs/getting-started/setup-openfga/configuration#OPENFGA_MAX_CHECKS_PER_BATCH_CHECK) environment variable. If `BatchCheck` is called using the SDK, the SDK can split the batch check requests for you.\n" +
 	"\n" +
-	"For more details on how `Check` functions, see the docs for `/check`.\n" +
+	"For more details on how `Check` functions, review the docs for `/check`.\n" +
 	"\n" +
 	"### Examples\n" +
 	"#### A BatchCheckRequest\n" +
@@ -3527,10 +3553,11 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"}\n" +
 	"```\n" +
 	"*\n" +
-	"BatchCheck\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/stores/{store_id}/batch-check\x12\xda\x1e\n" +
-	"\x06Expand\x12\x19.openfga.v1.ExpandRequest\x1a\x1a.openfga.v1.ExpandResponse\"\x98\x1e\x92A\xf0\x1d\n" +
-	"\x14Relationship Queries\x12\x8e\x01Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship\x1a\xbe\x1cThe Expand API will return all users and usersets that have certain relationship with an object in a certain store.\n" +
+	"BatchCheck\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/stores/{store_id}/batch-check\x12\xf7\x1d\n" +
+	"\x06Expand\x12\x19.openfga.v1.ExpandRequest\x1a\x1a.openfga.v1.ExpandResponse\"\xb5\x1d\x92A\x8d\x1d\n" +
+	"\x14Relationship Queries\x12+Expand relationships in userset tree format\x1a\xbf\x1cThe Expand API will return all users and usersets that have certain relationship with an object in a certain store.\n" +
 	"This is different from the `/stores/{store_id}/read` API in that both users and computed usersets are returned.\n" +
+	"\n" +
 	"Body parameters `tuple_key.object` and `tuple_key.relation` are all required.\n" +
 	"A `contextual_tuples` object may also be included in the body of the request. This object contains one field `tuple_keys`, which is an array of tuple keys. Each of these tuples may have an associated `condition`.\n" +
 	"The response will return a tree whose leaves are the specific users and usersets. Union, intersection and difference operator are located in the intermediate nodes.\n" +
@@ -3687,14 +3714,14 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  }\n" +
 	"}\n" +
 	"```\n" +
-	"*\x06Expand\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/stores/{store_id}/expand\x12\x82\v\n" +
-	"\x17ReadAuthorizationModels\x12*.openfga.v1.ReadAuthorizationModelsRequest\x1a+.openfga.v1.ReadAuthorizationModelsResponse\"\x8d\n" +
-	"\x92A\xda\t\n" +
-	"\x14Authorization Models\x12:Return all the authorization models for a particular store\x1a\xec\bThe ReadAuthorizationModels API will return all the authorization models for a certain store.\n" +
-	"OpenFGA's response will contain an array of all authorization models, sorted in descending order of creation.\n" +
+	"*\x06Expand\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/stores/{store_id}/expand\x12\xde\n" +
+	"\n" +
+	"\x17ReadAuthorizationModels\x12*.openfga.v1.ReadAuthorizationModelsRequest\x1a+.openfga.v1.ReadAuthorizationModelsResponse\"\xe9\t\x92A\xb6\t\n" +
+	"\x14Authorization Models\x12\x1cGet all authorization models\x1a\xe6\bThe ReadAuthorizationModels API returns all the authorization models for a certain store.\n" +
+	"OpenFGA's response contains an array of all authorization models, sorted in descending order of creation.\n" +
 	"\n" +
 	"## Example\n" +
-	"Assume that a store's authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like:\n" +
+	"Assume that a store's authorization model has been configured twice. To get all the authorization models that have been created in this store, call `GET authorization-models`. The API will return a response that looks like:\n" +
 	"```json\n" +
 	"{\n" +
 	"  \"authorization_models\": [\n" +
@@ -3726,14 +3753,15 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  \"continuation_token\": \"\"\n" +
 	"}\n" +
 	"```\n" +
-	"*\x17ReadAuthorizationModels\x82\xd3\xe4\x93\x02)\x12'/stores/{store_id}/authorization-models\x12\x84\v\n" +
-	"\x16ReadAuthorizationModel\x12).openfga.v1.ReadAuthorizationModelRequest\x1a*.openfga.v1.ReadAuthorizationModelResponse\"\x92\n" +
-	"\x92A\xda\t\n" +
-	"\x14Authorization Models\x125Return a particular version of an authorization model\x1a\xf2\bThe ReadAuthorizationModel API returns an authorization model by its identifier.\n" +
+	"*\x17ReadAuthorizationModels\x82\xd3\xe4\x93\x02)\x12'/stores/{store_id}/authorization-models\x12\xf6\n" +
+	"\n" +
+	"\x16ReadAuthorizationModel\x12).openfga.v1.ReadAuthorizationModelRequest\x1a*.openfga.v1.ReadAuthorizationModelResponse\"\x84\n" +
+	"\x92A\xcc\t\n" +
+	"\x14Authorization Models\x12%Get an authorization model by version\x1a\xf4\bThe ReadAuthorizationModel API returns an authorization model by its identifier.\n" +
 	"The response will return the authorization model for the particular version.\n" +
 	"\n" +
 	"## Example\n" +
-	"To retrieve the authorization model with ID `01G5JAVJ41T49E9TT3SKVS7X1J` for the store, call the GET authorization-models by ID API with `01G5JAVJ41T49E9TT3SKVS7X1J` as the `id` path parameter.  The API will return:\n" +
+	"To retrieve the authorization model with ID `01G5JAVJ41T49E9TT3SKVS7X1J` for the store, call the `GET` authorization-models by ID API with `01G5JAVJ41T49E9TT3SKVS7X1J` as the `id` path parameter.  The API will return:\n" +
 	"```json\n" +
 	"{\n" +
 	"  \"authorization_model\":{\n" +
@@ -3769,16 +3797,16 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  }\n" +
 	"}\n" +
 	"```\n" +
-	"In the above example, there are 2 types (`user` and `document`). The `document` type has 2 relations (`writer` and `reader`).*\x16ReadAuthorizationModel\x82\xd3\xe4\x93\x02.\x12,/stores/{store_id}/authorization-models/{id}\x12\xf9\n" +
+	"In the above example, there are 2 types (`user` and `document`). The `document` type has 2 relations (`writer` and `reader`).*\x16ReadAuthorizationModel\x82\xd3\xe4\x93\x02.\x12,/stores/{store_id}/authorization-models/{id}\x12\xfd\n" +
 	"\n" +
-	"\x17WriteAuthorizationModel\x12*.openfga.v1.WriteAuthorizationModelRequest\x1a+.openfga.v1.WriteAuthorizationModelResponse\"\x84\n" +
-	"\x92A\xce\t\n" +
-	"\x14Authorization Models\x12 Create a new authorization model\x1a\xa8\bThe WriteAuthorizationModel API will add a new authorization model to a store.\n" +
+	"\x17WriteAuthorizationModel\x12*.openfga.v1.WriteAuthorizationModelRequest\x1a+.openfga.v1.WriteAuthorizationModelResponse\"\x88\n" +
+	"\x92A\xd2\t\n" +
+	"\x14Authorization Models\x12 Create a new authorization model\x1a\xac\bThe WriteAuthorizationModel API will add a new authorization model to a store.\n" +
 	"Each item in the `type_definitions` array is a type definition as specified in the field `type_definition`.\n" +
 	"The response will return the authorization model's ID in the `id` field.\n" +
 	"\n" +
 	"## Example\n" +
-	"To add an authorization model with `user` and `document` type definitions, call POST authorization-models API with the body: \n" +
+	"To add an authorization model with `user` and `document` type definitions, call `POST` `authorization-models` API with the body: \n" +
 	"```json\n" +
 	"{\n" +
 	"  \"type_definitions\":[\n" +
@@ -3818,18 +3846,18 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"*\x17WriteAuthorizationModelJP\n" +
 	"\x03201\x12I\n" +
 	"\x16A successful response.\x12/\n" +
-	"-\x1a+.openfga.v1.WriteAuthorizationModelResponse\x82\xd3\xe4\x93\x02,:\x01*\"'/stores/{store_id}/authorization-models\x12\xef\x04\n" +
-	"\x0fWriteAssertions\x12\".openfga.v1.WriteAssertionsRequest\x1a#.openfga.v1.WriteAssertionsResponse\"\x92\x04\x92A\xcd\x03\n" +
+	"-\x1a+.openfga.v1.WriteAuthorizationModelResponse\x82\xd3\xe4\x93\x02,:\x01*\"'/stores/{store_id}/authorization-models\x12\xe8\x04\n" +
+	"\x0fWriteAssertions\x12\".openfga.v1.WriteAssertionsRequest\x1a#.openfga.v1.WriteAssertionsResponse\"\x8b\x04\x92A\xc6\x03\n" +
 	"\n" +
-	"Assertions\x12/Upsert assertions for an authorization model ID\x1a\xb2\x02The WriteAssertions API will upsert new assertions for an authorization model id, or overwrite the existing ones. An assertion is an object that contains a tuple key, the expectation of whether a call to the Check API of that tuple key will return true or false, and optionally a list of contextual tuples.*\x0fWriteAssertionsJH\n" +
+	"Assertions\x12(Upsert authorization model ID assertions\x1a\xb2\x02The WriteAssertions API will upsert new assertions for an authorization model id, or overwrite the existing ones. An assertion is an object that contains a tuple key, the expectation of whether a call to the Check API of that tuple key will return true or false, and optionally a list of contextual tuples.*\x0fWriteAssertionsJH\n" +
 	"\x03204\x12A\n" +
 	"\x16A successful response.\x12'\n" +
-	"%\x1a#.openfga.v1.WriteAssertionsResponse\x82\xd3\xe4\x93\x02;:\x01*\x1a6/stores/{store_id}/assertions/{authorization_model_id}\x12\xd3\x02\n" +
-	"\x0eReadAssertions\x12!.openfga.v1.ReadAssertionsRequest\x1a\".openfga.v1.ReadAssertionsResponse\"\xf9\x01\x92A\xb7\x01\n" +
+	"%\x1a#.openfga.v1.WriteAssertionsResponse\x82\xd3\xe4\x93\x02;:\x01*\x1a6/stores/{store_id}/assertions/{authorization_model_id}\x12\xbd\x02\n" +
+	"\x0eReadAssertions\x12!.openfga.v1.ReadAssertionsRequest\x1a\".openfga.v1.ReadAssertionsResponse\"\xe3\x01\x92A\xa1\x01\n" +
 	"\n" +
-	"Assertions\x12-Read assertions for an authorization model ID\x1ajThe ReadAssertions API will return, for a given authorization model id, all the assertions stored for it. *\x0eReadAssertions\x82\xd3\xe4\x93\x028\x126/stores/{store_id}/assertions/{authorization_model_id}\x12\xe3\a\n" +
-	"\vReadChanges\x12\x1e.openfga.v1.ReadChangesRequest\x1a\x1f.openfga.v1.ReadChangesResponse\"\x92\a\x92A\xec\x06\n" +
-	"\x13Relationship Tuples\x12&Return a list of all the tuple changes\x1a\x9f\x06The ReadChanges API will return a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response will include a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token will be returned in order for it to be used when new changes are recorded. If the store never had any tuples added or removed, this token will be empty.\n" +
+	"Assertions\x12%Get authorization model ID assertions\x1a\\The ReadAssertions API returns all the assertions stored for a given authorization model id.*\x0eReadAssertions\x82\xd3\xe4\x93\x028\x126/stores/{store_id}/assertions/{authorization_model_id}\x12\xd2\a\n" +
+	"\vReadChanges\x12\x1e.openfga.v1.ReadChangesRequest\x1a\x1f.openfga.v1.ReadChangesResponse\"\x81\a\x92A\xdb\x06\n" +
+	"\x13Relationship Tuples\x12\x15Get all tuple changes\x1a\x9f\x06The ReadChanges API will return a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response will include a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token will be returned in order for it to be used when new changes are recorded. If the store never had any tuples added or removed, this token will be empty.\n" +
 	"You can use the `type` parameter to only get the list of tuple changes that affect objects of that type.\n" +
 	"When reading a write tuple change, if it was conditioned, the condition will be returned.\n" +
 	"When reading a delete tuple change, the condition will NOT be returned regardless of whether it was originally conditioned or not.\n" +
@@ -3856,32 +3884,67 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"\x06Stores\x12\x0fList all stores\x1a\xa0\x01Returns a paginated list of OpenFGA stores and a continuation token to get additional stores.\n" +
 	"The continuation token will be empty if there are no more stores.\n" +
 	"*\n" +
-	"ListStores\x82\xd3\xe4\x93\x02\t\x12\a/stores\x12\xf1\x04\n" +
-	"\x13StreamedListObjects\x12&.openfga.v1.StreamedListObjectsRequest\x1a'.openfga.v1.StreamedListObjectsResponse\"\x86\x04\x92A\xcf\x03\n" +
-	"\x14Relationship Queries\x12FStream all objects of the given type that the user has a relation with\x1a\xd9\x02The Streamed ListObjects API is very similar to the the ListObjects API, with two differences: \n" +
+	"ListStores\x82\xd3\xe4\x93\x02\t\x12\a/stores\x12\xd8\x04\n" +
+	"\x13StreamedListObjects\x12&.openfga.v1.StreamedListObjectsRequest\x1a'.openfga.v1.StreamedListObjectsResponse\"\xed\x03\x92A\xb6\x03\n" +
+	"\x14Relationship Queries\x12+Stream all objects with a user relationship\x1a\xdb\x02The Streamed ListObjects API is very similar to the the ListObjects API, with two differences: \n" +
 	"1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected. \n" +
-	"2. The number of results returned is only limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE. \n" +
-	"*\x13StreamedListObjects\x82\xd3\xe4\x93\x02-:\x01*\"(/stores/{store_id}/streamed-list-objects0\x01\x12\xdd\x11\n" +
-	"\vListObjects\x12\x1e.openfga.v1.ListObjectsRequest\x1a\x1f.openfga.v1.ListObjectsResponse\"\x8c\x11\x92A\xde\x10\n" +
-	"\x14Relationship Queries\x12DList all objects of the given type that the user has a relation with\x1a\xf2\x0fThe ListObjects API returns a list of all the objects of the given type that the user has a relation with.\n" +
-	" To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`).\n" +
-	"An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance.\n" +
-	"You may also specify `contextual_tuples` that will be treated as regular tuples. Each of these tuples may have an associated `condition`.\n" +
-	"You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly.\n" +
+	"2. The number of results returned is only limited by the execution timeout specified in the flag `OPENFGA_LIST_OBJECTS_DEADLINE`. \n" +
+	"*\x13StreamedListObjects\x82\xd3\xe4\x93\x02-:\x01*\"(/stores/{store_id}/streamed-list-objects0\x01\x12\xd8\x11\n" +
+	"\vListObjects\x12\x1e.openfga.v1.ListObjectsRequest\x1a\x1f.openfga.v1.ListObjectsResponse\"\x87\x11\x92A\xd9\x10\n" +
+	"\x14Relationship Queries\x12/List all objects with user-centric relationship\x1a\x82\x10The ListObjects API returns a list of all the objects of the given type that the user has a relation with.\n" +
+	" To arrive at a result, the API uses:\n" +
+	"\n" +
+	"- An authorization model\n" +
+	"- Explicit tuples written through the Write API\n" +
+	"- Contextual tuples present in the request\n" +
+	"- Implicit tuples that exist by virtue of applying set theory. For example:\n" +
+	"\n" +
+	"`document:2021-budget#viewer@document:2021-budget#viewer`\n" +
+	"\n" +
+	"In the example the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`.\n" +
+	"\n" +
+	"An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used.\n" +
+	"\n" +
+	"> **Note:** We recommend you specify authorization model ID for better performance.\n" +
+	"\n" +
+	"You may also specify `contextual_tuples` that is treated as regular tuples. Each of these tuples may have an associated `condition`.\n" +
+	"You may also provide a `context` object that is used to evaluate the conditioned tuples in the system.\n" +
+	"\n" +
+	"> **Note:** We recommend you provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly.\n" +
+	"\n" +
 	"By default, the Check API caches results for a short time to optimize performance. You may specify a value of `HIGHER_CONSISTENCY` for the optional `consistency` parameter in the body to inform the server that higher conisistency is preferred at the expense of increased latency. Consideration should be given to the increased latency if requesting higher consistency.\n" +
-	"The response will contain the related objects in an array in the \"objects\" field of the response and they will be strings in the object format `<type>:<id>` (e.g. \"document:roadmap\").\n" +
-	"The number of objects in the response array will be limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE and by the upper bound specified in the flag OPENFGA_LIST_OBJECTS_MAX_RESULTS, whichever is hit first.\n" +
-	"The objects given will not be sorted, and therefore two identical calls can give a given different set of objects.*\vListObjects\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/stores/{store_id}/list-objects\x12\xe5\x11\n" +
-	"\tListUsers\x12\x1c.openfga.v1.ListUsersRequest\x1a\x1d.openfga.v1.ListUsersResponse\"\x9a\x11\x92A\xee\x10\n" +
-	"\x14Relationship Queries\x12]List the users matching the provided filter who have a certain relation to a particular type.\x1a\xeb\x0fThe ListUsers API returns a list of all the users of a specific type that have a relation to a given object.\n" +
-	" To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`).\n" +
-	"An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance.\n" +
+	"The response contains the related objects in an array in the \"objects\" field of the response and they will be strings in the object format `<type>:<id>` (e.g. \"document:roadmap\").\n" +
+	"\n" +
+	"The number of objects in the response array will be limited by the execution timeout specified in the flag `OPENFGA_LIST_OBJECTS_DEADLINE` and by the upper bound specified in the flag `OPENFGA_LIST_OBJECTS_MAX_RESULTS`, whichever is hit first.\n" +
+	"The objects given will not be sorted, and therefore two identical calls can give a given different set of objects.*\vListObjects\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/stores/{store_id}/list-objects\x12\xdc\x11\n" +
+	"\tListUsers\x12\x1c.openfga.v1.ListUsersRequest\x1a\x1d.openfga.v1.ListUsersResponse\"\x91\x11\x92A\xe5\x10\n" +
+	"\x14Relationship Queries\x12/List all users with a relationship to an object\x1a\x90\x10The ListUsers API returns a list of all the users of a specific type that have a relation to a given object.\n" +
+	"\n" +
+	" To arrive at a result, the API uses:\n" +
+	"\n" +
+	"- An authorization model\n" +
+	"\n" +
+	"- Explicit tuples written through the Write API\n" +
+	"\n" +
+	"- Contextual tuples present in the request\n" +
+	"\n" +
+	"- Implicit tuples that exist by virtue of applying set theory\n" +
+	"\n" +
+	"For example: `document:2021-budget#viewer@document:2021-budget#viewer`. In this example, the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`.\n" +
+	"\n" +
+	"An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used.\n" +
+	"\n" +
+	"> **Note:** We recommend you specify authorization model ID for better performance.\n" +
+	"\n" +
 	"You may also specify `contextual_tuples` that will be treated as regular tuples. Each of these tuples may have an associated `condition`.\n" +
-	"You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly.\n" +
+	"You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system.\n" +
+	"\n" +
+	"> **Note:** We recommend you provide a value for all the input parameters of all the conditions. This ensures that all tuples be evaluated correctly.\n" +
+	"\n" +
 	"The response will contain the related users in an array in the \"users\" field of the response. These results may include specific objects, usersets \n" +
 	"or type-bound public access. Each of these types of results is encoded in its own type and not represented as a string.In cases where a type-bound public access result is returned (e.g. `user:*`), it cannot be inferred that all subjects\n" +
 	"of that type have a relation to the object; it is possible that negations exist and checks should still be queried\n" +
-	"on individual subjects to ensure access to that document.The number of users in the response array will be limited by the execution timeout specified in the flag OPENFGA_LIST_USERS_DEADLINE and by the upper bound specified in the flag OPENFGA_LIST_USERS_MAX_RESULTS, whichever is hit first.\n" +
+	"on individual subjects to ensure access to that document.The number of users in the response array will be limited by the execution timeout specified in the flag `OPENFGA_LIST_USERS_DEADLINE` and by the upper bound specified in the flag `OPENFGA_LIST_USERS_MAX_RESULTS`, whichever is hit first.\n" +
 	"The returned users will not be sorted, and therefore two identical calls may yield different sets of users.*\tListUsers\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/stores/{store_id}/list-usersB\xa1\x01\n" +
 	"\x0ecom.openfga.v1B\x13OpenfgaServiceProtoP\x01Z1github.com/openfga/api/proto/openfga/v1;openfgav1\xa2\x02\x03OXX\xaa\x02\n" +
 	"Openfga.V1\xca\x02\n" +
