@@ -39,7 +39,7 @@ type ListObjectsRequest struct {
 	// Additional request context that are used to evaluate any ABAC conditions encountered
 	// in the query evaluation.
 	Context *structpb.Struct `protobuf:"bytes,7,opt,name=context,proto3" json:"context,omitempty"`
-	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
 	Consistency   ConsistencyPreference `protobuf:"varint,8,opt,name=consistency,proto3,enum=openfga.v1.ConsistencyPreference" json:"consistency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -186,7 +186,7 @@ type ListUsersRequest struct {
 	// Additional request context used to evaluate any ABAC conditions encountered
 	// in the query evaluation.
 	Context *structpb.Struct `protobuf:"bytes,7,opt,name=context,proto3" json:"context,omitempty"`
-	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
 	Consistency   ConsistencyPreference `protobuf:"varint,8,opt,name=consistency,proto3,enum=openfga.v1.ConsistencyPreference" json:"consistency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -333,7 +333,7 @@ type StreamedListObjectsRequest struct {
 	// Additional request context used to evaluate any ABAC conditions encountered
 	// in the query evaluation.
 	Context *structpb.Struct `protobuf:"bytes,7,opt,name=context,proto3" json:"context,omitempty"`
-	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
 	Consistency   ConsistencyPreference `protobuf:"varint,8,opt,name=consistency,proto3,enum=openfga.v1.ConsistencyPreference" json:"consistency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -476,7 +476,7 @@ type ReadRequest struct {
 	TupleKey          *ReadRequestTupleKey   `protobuf:"bytes,2,opt,name=tuple_key,proto3" json:"tuple_key,omitempty"`
 	PageSize          *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=page_size,proto3" json:"page_size,omitempty"`
 	ContinuationToken string                 `protobuf:"bytes,4,opt,name=continuation_token,proto3" json:"continuation_token,omitempty"`
-	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
 	Consistency   ConsistencyPreference `protobuf:"varint,5,opt,name=consistency,proto3,enum=openfga.v1.ConsistencyPreference" json:"consistency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1433,7 +1433,7 @@ type ExpandRequest struct {
 	StoreId              string                 `protobuf:"bytes,1,opt,name=store_id,proto3" json:"store_id,omitempty"`
 	TupleKey             *ExpandRequestTupleKey `protobuf:"bytes,2,opt,name=tuple_key,proto3" json:"tuple_key,omitempty"`
 	AuthorizationModelId string                 `protobuf:"bytes,3,opt,name=authorization_model_id,proto3" json:"authorization_model_id,omitempty"`
-	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+	// Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
 	Consistency      ConsistencyPreference `protobuf:"varint,4,opt,name=consistency,proto3,enum=openfga.v1.ConsistencyPreference" json:"consistency,omitempty"`
 	ContextualTuples *ContextualTupleKeys  `protobuf:"bytes,5,opt,name=contextual_tuples,proto3" json:"contextual_tuples,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -3207,10 +3207,10 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"Assertions\x12:\n" +
 	"\n" +
 	"assertions\x18\x01 \x03(\v2\x15.openfga.v1.AssertionB\x03\xe0A\x02R\n" +
-	"assertions2\x92\xee\x01\n" +
-	"\x0eOpenFGAService\x12\x84\x1d\n" +
-	"\x04Read\x12\x17.openfga.v1.ReadRequest\x1a\x18.openfga.v1.ReadResponse\"\xc8\x1c\x92A\xa2\x1c\n" +
-	"\x13Relationship Tuples\x12\x12Get related tuples\x1a\xf0\x1bThe Read API returns the tuples from a certain store that match a query filter specified in the body of the request. \n" +
+	"assertions2\xcb\xee\x01\n" +
+	"\x0eOpenFGAService\x12\x90\x1d\n" +
+	"\x04Read\x12\x17.openfga.v1.ReadRequest\x1a\x18.openfga.v1.ReadResponse\"\xd4\x1c\x92A\xae\x1c\n" +
+	"\x13Relationship Tuples\x12\x1eGet stored relationship tuples\x1a\xf0\x1bThe Read API returns the tuples from a certain store that match a query filter specified in the body of the request. \n" +
 	"The API doesn't guarantee order by any field. \n" +
 	"It is different from the `/stores/{store_id}/expand` API in that it only returns relationship tuples that are stored in the system and satisfy the query. \n" +
 	"In the body:\n" +
@@ -3510,10 +3510,10 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  \"consistency\": \"HIGHER_CONSISTENCY\"\n" +
 	"}\n" +
 	"```\n" +
-	"*\x05Check\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/stores/{store_id}/check\x12\x95\x13\n" +
+	"*\x05Check\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/stores/{store_id}/check\x12\x96\x13\n" +
 	"\n" +
-	"BatchCheck\x12\x1d.openfga.v1.BatchCheckRequest\x1a\x1e.openfga.v1.BatchCheckResponse\"\xc7\x12\x92A\x9a\x12\n" +
-	"\x14Relationship Queries\x120Check multiple relationships in a single request\x1a\xc3\x11The `BatchCheck` API functions nearly identically to `Check`, but instead of checking a single user-object relationship BatchCheck accepts a list of relationships to check and returns a map containing `BatchCheckItem` response for each check it received.\n" +
+	"BatchCheck\x12\x1d.openfga.v1.BatchCheckRequest\x1a\x1e.openfga.v1.BatchCheckResponse\"\xc8\x12\x92A\x9b\x12\n" +
+	"\x14Relationship Queries\x121Check multiple authorizations in a single request\x1a\xc3\x11The `BatchCheck` API functions nearly identically to `Check`, but instead of checking a single user-object relationship BatchCheck accepts a list of relationships to check and returns a map containing `BatchCheckItem` response for each check it received.\n" +
 	"\n" +
 	"An associated `correlation_id` is required for each check in the batch. This ID is used to correlate a check to the appropriate response. It is a string consisting of only alphanumeric characters or hyphens with a maximum length of 36 characters. This `correlation_id` is used to map the result of each check to the item which was checked, so it must be unique for each item in the batch. We recommend using a UUID or ULID as the `correlation_id`, but you can use whatever unique identifier you need as long  as it matches this regex pattern: `^[\\w\\d-]{1,36}$`\n" +
 	"\n" +
@@ -3771,11 +3771,12 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"  \"continuation_token\": \"\"\n" +
 	"}\n" +
 	"```\n" +
-	"*\x17ReadAuthorizationModels\x82\xd3\xe4\x93\x02)\x12'/stores/{store_id}/authorization-models\x12\xef\n" +
+	"*\x17ReadAuthorizationModels\x82\xd3\xe4\x93\x02)\x12'/stores/{store_id}/authorization-models\x12\xbf\v\n" +
+	"\x16ReadAuthorizationModel\x12).openfga.v1.ReadAuthorizationModelRequest\x1a*.openfga.v1.ReadAuthorizationModelResponse\"\xcd\n" +
+	"\x92A\x95\n" +
 	"\n" +
-	"\x16ReadAuthorizationModel\x12).openfga.v1.ReadAuthorizationModelRequest\x1a*.openfga.v1.ReadAuthorizationModelResponse\"\xfd\t\x92A\xc5\t\n" +
-	"\x14Authorization Models\x12%Get an authorization model by version\x1a\xed\bThe ReadAuthorizationModel API returns an authorization model by its identifier.\n" +
-	"The response returns the authorization model for the particular version.\n" +
+	"\x14Authorization Models\x12$Get an authorization model by its ID\x1a\xbe\tThe response returns the authorization model for the particular ID.\n" +
+	"Authorization Models in OpenFGA are [immutable](/docs/getting-started/immutable-models), new versions can be created, but existing ones cannot be deleted or modified.\n" +
 	"\n" +
 	"## Example\n" +
 	"\n" +
@@ -3864,16 +3865,16 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"*\x17WriteAuthorizationModelJP\n" +
 	"\x03201\x12I\n" +
 	"\x16A successful response.\x12/\n" +
-	"-\x1a+.openfga.v1.WriteAuthorizationModelResponse\x82\xd3\xe4\x93\x02,:\x01*\"'/stores/{store_id}/authorization-models\x12\xe0\x04\n" +
-	"\x0fWriteAssertions\x12\".openfga.v1.WriteAssertionsRequest\x1a#.openfga.v1.WriteAssertionsResponse\"\x83\x04\x92A\xbe\x03\n" +
+	"-\x1a+.openfga.v1.WriteAuthorizationModelResponse\x82\xd3\xe4\x93\x02,:\x01*\"'/stores/{store_id}/authorization-models\x12\xd5\x04\n" +
+	"\x0fWriteAssertions\x12\".openfga.v1.WriteAssertionsRequest\x1a#.openfga.v1.WriteAssertionsResponse\"\xf8\x03\x92A\xb3\x03\n" +
 	"\n" +
-	"Assertions\x12(Upsert authorization model ID assertions\x1a\xaa\x02The WriteAssertions API upserts new assertions for an authorization model id, or overwrite the existing ones. An assertion is an object that contains a tuple key, the expectation of whether a call to the Check API of that tuple key returns true or false, and optionally a list of contextual tuples.*\x0fWriteAssertionsJH\n" +
+	"Assertions\x12\x1dUpsert assertions for a model\x1a\xaa\x02The WriteAssertions API upserts new assertions for an authorization model id, or overwrite the existing ones. An assertion is an object that contains a tuple key, the expectation of whether a call to the Check API of that tuple key returns true or false, and optionally a list of contextual tuples.*\x0fWriteAssertionsJH\n" +
 	"\x03204\x12A\n" +
 	"\x16A successful response.\x12'\n" +
-	"%\x1a#.openfga.v1.WriteAssertionsResponse\x82\xd3\xe4\x93\x02;:\x01*\x1a6/stores/{store_id}/assertions/{authorization_model_id}\x12\xbd\x02\n" +
-	"\x0eReadAssertions\x12!.openfga.v1.ReadAssertionsRequest\x1a\".openfga.v1.ReadAssertionsResponse\"\xe3\x01\x92A\xa1\x01\n" +
+	"%\x1a#.openfga.v1.WriteAssertionsResponse\x82\xd3\xe4\x93\x02;:\x01*\x1a6/stores/{store_id}/assertions/{authorization_model_id}\x12\xb2\x02\n" +
+	"\x0eReadAssertions\x12!.openfga.v1.ReadAssertionsRequest\x1a\".openfga.v1.ReadAssertionsResponse\"\xd8\x01\x92A\x96\x01\n" +
 	"\n" +
-	"Assertions\x12%Get authorization model ID assertions\x1a\\The ReadAssertions API returns all the assertions stored for a given authorization model id.*\x0eReadAssertions\x82\xd3\xe4\x93\x028\x126/stores/{store_id}/assertions/{authorization_model_id}\x12\xc1\a\n" +
+	"Assertions\x12\x1aGet assertions for a model\x1a\\The ReadAssertions API returns all the assertions stored for a given authorization model ID.*\x0eReadAssertions\x82\xd3\xe4\x93\x028\x126/stores/{store_id}/assertions/{authorization_model_id}\x12\xc1\a\n" +
 	"\vReadChanges\x12\x1e.openfga.v1.ReadChangesRequest\x1a\x1f.openfga.v1.ReadChangesResponse\"\xf0\x06\x92A\xca\x06\n" +
 	"\x13Relationship Tuples\x12\x15Get all tuple changes\x1a\x8e\x06The ReadChanges API returns a paginated list of tuple changes (additions and deletions) that occurred in a given store, sorted by ascending time. The response includes a continuation token that is used to get the next set of changes. If there are no changes after the provided continuation token, the same token is returned in order for it to be used when new changes are recorded.\n" +
 	"\n" +
@@ -3909,9 +3910,9 @@ const file_openfga_v1_openfga_service_proto_rawDesc = "" +
 	"\x14Relationship Queries\x12+Stream all objects with a user relationship\x1a\xdb\x02The Streamed ListObjects API is very similar to the the ListObjects API, with two differences: \n" +
 	"1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected. \n" +
 	"2. The number of results returned is only limited by the execution timeout specified in the flag `OPENFGA_LIST_OBJECTS_DEADLINE`. \n" +
-	"*\x13StreamedListObjects\x82\xd3\xe4\x93\x02-:\x01*\"(/stores/{store_id}/streamed-list-objects0\x01\x12\xeb\x11\n" +
-	"\vListObjects\x12\x1e.openfga.v1.ListObjectsRequest\x1a\x1f.openfga.v1.ListObjectsResponse\"\x9a\x11\x92A\xec\x10\n" +
-	"\x14Relationship Queries\x12/List all objects with user-centric relationship\x1a\x95\x10The ListObjects API returns a list of all the objects of the given type that the user has a relation with.\n" +
+	"*\x13StreamedListObjects\x82\xd3\xe4\x93\x02-:\x01*\"(/stores/{store_id}/streamed-list-objects0\x01\x12\xdd\x11\n" +
+	"\vListObjects\x12\x1e.openfga.v1.ListObjectsRequest\x1a\x1f.openfga.v1.ListObjectsResponse\"\x8c\x11\x92A\xde\x10\n" +
+	"\x14Relationship Queries\x12!List objects a user is related to\x1a\x95\x10The ListObjects API returns a list of all the objects of the given type that the user has a relation with.\n" +
 	" To arrive at a result, the API uses:\n" +
 	"\n" +
 	"- An [authorization model](/docs/getting-started/configure-model)\n" +

@@ -764,8 +764,8 @@
     },
     "/stores/{store_id}/assertions/{authorization_model_id}": {
       "get": {
-        "summary": "Get authorization model ID assertions",
-        "description": "The ReadAssertions API returns all the assertions stored for a given authorization model id.",
+        "summary": "Get assertions for a model",
+        "description": "The ReadAssertions API returns all the assertions stored for a given authorization model ID.",
         "operationId": "ReadAssertions",
         "responses": {
           "200": {
@@ -836,7 +836,7 @@
         ]
       },
       "put": {
-        "summary": "Upsert authorization model ID assertions",
+        "summary": "Upsert assertions for a model",
         "description": "The WriteAssertions API upserts new assertions for an authorization model id, or overwrite the existing ones. An assertion is an object that contains a tuple key, the expectation of whether a call to the Check API of that tuple key returns true or false, and optionally a list of contextual tuples.",
         "operationId": "WriteAssertions",
         "responses": {
@@ -1070,8 +1070,8 @@
     },
     "/stores/{store_id}/authorization-models/{id}": {
       "get": {
-        "summary": "Get an authorization model by version",
-        "description": "The ReadAuthorizationModel API returns an authorization model by its identifier.\nThe response returns the authorization model for the particular version.\n\n## Example\n\nTo retrieve the authorization model with ID `01G5JAVJ41T49E9TT3SKVS7X1J` for the store, call the `GET` authorization-models by ID API with `01G5JAVJ41T49E9TT3SKVS7X1J` as the `id` path parameter.  The API returns:\n```json\n{\n  \"authorization_model\":{\n    \"id\":\"01G5JAVJ41T49E9TT3SKVS7X1J\",\n    \"type_definitions\":[\n      {\n        \"type\":\"user\"\n      },\n      {\n        \"type\":\"document\",\n        \"relations\":{\n          \"reader\":{\n            \"union\":{\n              \"child\":[\n                {\n                  \"this\":{}\n                },\n                {\n                  \"computedUserset\":{\n                    \"object\":\"\",\n                    \"relation\":\"writer\"\n                  }\n                }\n              ]\n            }\n          },\n          \"writer\":{\n            \"this\":{}\n          }\n        }\n      }\n    ]\n  }\n}\n```\nIn the above example, there are 2 types (`user` and `document`). The `document` type has 2 relations (`writer` and `reader`).",
+        "summary": "Get an authorization model by its ID",
+        "description": "The response returns the authorization model for the particular ID.\nAuthorization Models in OpenFGA are [immutable](/docs/getting-started/immutable-models), new versions can be created, but existing ones cannot be deleted or modified.\n\n## Example\n\nTo retrieve the authorization model with ID `01G5JAVJ41T49E9TT3SKVS7X1J` for the store, call the `GET` authorization-models by ID API with `01G5JAVJ41T49E9TT3SKVS7X1J` as the `id` path parameter.  The API returns:\n```json\n{\n  \"authorization_model\":{\n    \"id\":\"01G5JAVJ41T49E9TT3SKVS7X1J\",\n    \"type_definitions\":[\n      {\n        \"type\":\"user\"\n      },\n      {\n        \"type\":\"document\",\n        \"relations\":{\n          \"reader\":{\n            \"union\":{\n              \"child\":[\n                {\n                  \"this\":{}\n                },\n                {\n                  \"computedUserset\":{\n                    \"object\":\"\",\n                    \"relation\":\"writer\"\n                  }\n                }\n              ]\n            }\n          },\n          \"writer\":{\n            \"this\":{}\n          }\n        }\n      }\n    ]\n  }\n}\n```\nIn the above example, there are 2 types (`user` and `document`). The `document` type has 2 relations (`writer` and `reader`).",
         "operationId": "ReadAuthorizationModel",
         "responses": {
           "200": {
@@ -1144,7 +1144,7 @@
     },
     "/stores/{store_id}/batch-check": {
       "post": {
-        "summary": "Check multiple relationships in a single request",
+        "summary": "Check multiple authorizations in a single request",
         "description": "The `BatchCheck` API functions nearly identically to `Check`, but instead of checking a single user-object relationship BatchCheck accepts a list of relationships to check and returns a map containing `BatchCheckItem` response for each check it received.\n\nAn associated `correlation_id` is required for each check in the batch. This ID is used to correlate a check to the appropriate response. It is a string consisting of only alphanumeric characters or hyphens with a maximum length of 36 characters. This `correlation_id` is used to map the result of each check to the item which was checked, so it must be unique for each item in the batch. We recommend using a UUID or ULID as the `correlation_id`, but you can use whatever unique identifier you need as long  as it matches this regex pattern: `^[\\w\\d-]{1,36}$`\n\n> **Note:** The maximum number of checks that can be passed in the `BatchCheck` API is configurable using the environment variable: `[OPENFGA_MAX_CHECKS_PER_BATCH_CHECK](https://openfga.dev/docs/getting-started/setup-openfga/configuration#OPENFGA_MAX_CHECKS_PER_BATCH_CHECK)`. If `BatchCheck` is called using the SDK, the SDK can split the batch check requests for you.\n\nFor more details on how `Check` functions, review the docs for `/check`.\n\n### Examples\n\n#### A BatchCheckRequest\n```json\n{\n  \"checks\": [\n     {\n       \"tuple_key\": {\n         \"object\": \"document:2021-budget\"\n         \"relation\": \"reader\",\n         \"user\": \"user:anne\",\n       },\n       \"contextual_tuples\": {...}\n       \"context\": {}\n       \"correlation_id\": \"01JA8PM3QM7VBPGB8KMPK8SBD5\"\n     },\n     {\n       \"tuple_key\": {\n         \"object\": \"document:2021-budget\"\n         \"relation\": \"reader\",\n         \"user\": \"user:bob\",\n       },\n       \"contextual_tuples\": {...}\n       \"context\": {}\n       \"correlation_id\": \"01JA8PMM6A90NV5ET0F28CYSZQ\"\n     }\n   ]\n}\n```\n\nBelow is a possible response to the above request. Note that the result map's keys are the `correlation_id` values from the checked items in the request:\n```json\n{\n   \"result\": {\n     \"01JA8PMM6A90NV5ET0F28CYSZQ\": {\n       \"allowed\": false, \n       \"error\": {\"message\": \"\"} \n    },\n     \"01JA8PM3QM7VBPGB8KMPK8SBD5\": {\n       \"allowed\": true, \n       \"error\": {\"message\": \"\"} \n    }\n}\n```\n",
         "operationId": "BatchCheck",
         "responses": {
@@ -1467,7 +1467,7 @@
     },
     "/stores/{store_id}/list-objects": {
       "post": {
-        "summary": "List all objects with user-centric relationship",
+        "summary": "List objects a user is related to",
         "description": "The ListObjects API returns a list of all the objects of the given type that the user has a relation with.\n To arrive at a result, the API uses:\n\n- An [authorization model](/docs/getting-started/configure-model)\n- Explicit tuples written through the Write API\n- Contextual tuples present in the request\n- Implicit tuples that exist by virtue of applying set theory. For example:\n\n`document:2021-budget#viewer@document:2021-budget#viewer`\n\nIn the example the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`.\n\nAn `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID is used.\n\n> **Note:** We recommend you specify authorization model ID for better performance.\n\nYou may also specify `contextual_tuples` that is treated as regular tuples. Each of these tuples may have an associated `condition`.\nYou may also provide a `context` object that is used to evaluate the conditioned tuples in the system.\n\n> **Note:** We recommend you provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly.\n\nBy default, the Check API caches results for a short time to optimize performance. You may specify a value of `HIGHER_CONSISTENCY` for the optional `consistency` parameter in the body to inform the server that higher conisistency is preferred at the expense of increased latency. Consideration should be given to the increased latency if requesting higher consistency.\nThe response contains the related objects in an array in the \"objects\" field of the response and are strings in the object format `<type>:<id>` (e.g. \"document:roadmap\").\n\nThe number of objects in the response array are limited by the execution timeout specified in the flag `OPENFGA_LIST_OBJECTS_DEADLINE` and by the upper bound specified in the flag `OPENFGA_LIST_OBJECTS_MAX_RESULTS`, whichever is hit first.\nThe objects given are not sorted, and therefore two identical calls can give a given different set of objects.",
         "operationId": "ListObjects",
         "responses": {
@@ -1619,7 +1619,7 @@
     },
     "/stores/{store_id}/read": {
       "post": {
-        "summary": "Get related tuples",
+        "summary": "Get stored relationship tuples",
         "description": "The Read API returns the tuples from a certain store that match a query filter specified in the body of the request. \nThe API doesn't guarantee order by any field. \nIt is different from the `/stores/{store_id}/expand` API in that it only returns relationship tuples that are stored in the system and satisfy the query. \nIn the body:\n1. `tuple_key` is optional. If not specified, it returns all tuples in the store.\n2. `tuple_key.object` is mandatory if `tuple_key` is specified. It can be a full object (e.g., `type:object_id`) or type only (e.g., `type:`).\n3. `tuple_key.user` is mandatory if tuple_key is specified in the case the `tuple_key.object` is a type only. If tuple_key.user is specified, it needs to be a full object (e.g., `type:user_id`).\n\n## Examples\n\n### Query for all objects in a type definition\n\nTo query for all objects that `user:bob` has `reader` relationship in the `document` type definition, call read API with body of\n```json\n{\n \"tuple_key\": {\n     \"user\": \"user:bob\",\n     \"relation\": \"reader\",\n     \"object\": \"document:\"\n  }\n}\n```\nThe API returns tuples and a continuation token, similar to:\n```json\n{\n  \"tuples\": [\n    {\n      \"key\": {\n        \"user\": \"user:bob\",\n        \"relation\": \"reader\",\n        \"object\": \"document:2021-budget\"\n      },\n      \"timestamp\": \"2021-10-06T15:32:11.128Z\"\n    }\n  ],\n  \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\"\n}\n```\nThis means that `user:bob` has a `reader` relationship with 1 document `document:2021-budget`. Note that this API, unlike the List Objects API, does not evaluate the tuples in the store.\nThe continuation token is empty if there are no more tuples to query.\n\n### Query for all stored relationship tuples that have a particular relation and object\n\nTo query for all users that have `reader` relationship with `document:2021-budget`, call read API with body of \n```json\n{\n  \"tuple_key\": {\n     \"object\": \"document:2021-budget\",\n     \"relation\": \"reader\"\n   }\n}\n```\nThe API returns something similar to: \n```json\n{\n  \"tuples\": [\n    {\n      \"key\": {\n        \"user\": \"user:bob\",\n        \"relation\": \"reader\",\n        \"object\": \"document:2021-budget\"\n      },\n      \"timestamp\": \"2021-10-06T15:32:11.128Z\"\n    }\n  ],\n  \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\"\n}\n```\nThis means that `document:2021-budget` has 1 `reader` (`user:bob`).  Note that, even if the model said that all `writers` are also `readers`, the API does not return writers such as `user:anne` because it only returns tuples and does not evaluate them.\n\n### Query for all users with all relationships for a particular document\n\nTo query for all users that have any relationship with `document:2021-budget`, call read API with body of \n```json\n{\n  \"tuple_key\": {\n      \"object\": \"document:2021-budget\"\n   }\n}\n```\nThe API returns something similar to:\n```json\n{\n  \"tuples\": [\n    {\n      \"key\": {\n        \"user\": \"user:anne\",\n        \"relation\": \"writer\",\n        \"object\": \"document:2021-budget\"\n      },\n      \"timestamp\": \"2021-10-05T13:42:12.356Z\"\n    },\n    {\n      \"key\": {\n        \"user\": \"user:bob\",\n        \"relation\": \"reader\",\n        \"object\": \"document:2021-budget\"\n      },\n      \"timestamp\": \"2021-10-06T15:32:11.128Z\"\n    }\n  ],\n  \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\"\n}\n```\nThis means that `document:2021-budget` has 1 `reader` (`user:bob`) and 1 `writer` (`user:anne`).\n",
         "operationId": "Read",
         "responses": {
@@ -2559,7 +2559,7 @@
         },
         "consistency": {
           "$ref": "#/definitions/ConsistencyPreference",
-          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`."
+          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`."
         },
         "contextual_tuples": {
           "$ref": "#/definitions/ContextualTupleKeys"
@@ -2762,7 +2762,7 @@
         },
         "consistency": {
           "$ref": "#/definitions/ConsistencyPreference",
-          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`."
+          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`."
         }
       },
       "required": [
@@ -2858,7 +2858,7 @@
         },
         "consistency": {
           "$ref": "#/definitions/ConsistencyPreference",
-          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`."
+          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`."
         }
       },
       "required": [
@@ -2953,7 +2953,7 @@
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\nas a JSON `null` regardless of the integer value, and so will round trip to\na `0` value.\n\n - NULL_VALUE: Null value."
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "Object": {
       "type": "object",
@@ -3100,7 +3100,7 @@
         },
         "consistency": {
           "$ref": "#/definitions/ConsistencyPreference",
-          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`."
+          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`."
         }
       }
     },
@@ -3394,7 +3394,7 @@
         },
         "consistency": {
           "$ref": "#/definitions/ConsistencyPreference",
-          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`."
+          "description": "Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`."
         }
       },
       "required": [

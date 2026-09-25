@@ -23,7 +23,7 @@ service OpenFGAService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get related tuples"
+      summary: "Get stored relationship tuples"
       tags: ["Relationship Tuples"]
       operation_id: "Read"
       description:
@@ -346,7 +346,7 @@ service OpenFGAService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Check multiple relationships in a single request"
+      summary: "Check multiple authorizations in a single request"
       tags: ["Relationship Queries"]
       operation_id: "BatchCheck"
       description:
@@ -632,12 +632,13 @@ service OpenFGAService {
     option (google.api.http) = {get: "/stores/{store_id}/authorization-models/{id}"};
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get an authorization model by version"
+      summary: "Get an authorization model by its ID"
       tags: ["Authorization Models"]
       operation_id: "ReadAuthorizationModel"
       description:
-        "The ReadAuthorizationModel API returns an authorization model by its identifier.\n"
-        "The response returns the authorization model for the particular version.\n\n"
+        "The response returns the authorization model for the particular ID.\n"
+        "Authorization Models in OpenFGA are [immutable](/docs/getting-started/immutable-models), "
+        "new versions can be created, but existing ones cannot be deleted or modified.\n\n"
         "## Example\n\n"
         "To retrieve the authorization model with ID `01G5JAVJ41T49E9TT3SKVS7X1J` for the store, "
         "call the `GET` authorization-models by ID API with `01G5JAVJ41T49E9TT3SKVS7X1J` as the "
@@ -757,7 +758,7 @@ service OpenFGAService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Upsert authorization model ID assertions"
+      summary: "Upsert assertions for a model"
       tags: ["Assertions"]
       operation_id: "WriteAssertions"
       description:
@@ -781,10 +782,10 @@ service OpenFGAService {
     option (google.api.http) = {get: "/stores/{store_id}/assertions/{authorization_model_id}"};
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get authorization model ID assertions"
+      summary: "Get assertions for a model"
       tags: ["Assertions"]
       operation_id: "ReadAssertions"
-      description: "The ReadAssertions API returns all the assertions stored for a given authorization model id."
+      description: "The ReadAssertions API returns all the assertions stored for a given authorization model ID."
     };
   }
 
@@ -923,7 +924,7 @@ service OpenFGAService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "List all objects with user-centric relationship"
+      summary: "List objects a user is related to"
       tags: ["Relationship Queries"]
       operation_id: "ListObjects"
       description:
@@ -1034,7 +1035,7 @@ message ListObjectsRequest {
   // in the query evaluation.
   google.protobuf.Struct context = 7;
 
-  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
   ConsistencyPreference consistency = 8 [(validate.rules).enum.defined_only = true];
 }
 
@@ -1101,7 +1102,7 @@ message ListUsersRequest {
   // in the query evaluation.
   google.protobuf.Struct context = 7;
 
-  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
   ConsistencyPreference consistency = 8 [(validate.rules).enum.defined_only = true];
 }
 
@@ -1161,7 +1162,7 @@ message StreamedListObjectsRequest {
   // in the query evaluation.
   google.protobuf.Struct context = 7;
 
-  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
   ConsistencyPreference consistency = 8 [(validate.rules).enum.defined_only = true];
 }
 
@@ -1208,7 +1209,7 @@ message ReadRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\""}
   ];
 
-  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
   ConsistencyPreference consistency = 5 [(validate.rules).enum.defined_only = true];
 }
 
@@ -1497,7 +1498,7 @@ message ExpandRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: "\"01G5JAVJ41T49E9TT3SKVS7X1J\""}
   ];
 
-  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which have the same behavior as `MINIMIZE_LATENCY`.
+  // Controls the consistency preference for this request. Default value is `UNSPECIFIED`, which has the same behavior as `MINIMIZE_LATENCY`.
   ConsistencyPreference consistency = 4 [(validate.rules).enum.defined_only = true];
 
   openfga.v1.ContextualTupleKeys contextual_tuples = 5 [json_name = "contextual_tuples"];
